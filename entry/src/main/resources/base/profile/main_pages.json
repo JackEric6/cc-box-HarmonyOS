@@ -1,0 +1,14 @@
+{
+  "src": [
+    "pages/HomePage",
+    "pages/SearchPage",
+    "pages/DetailPage",
+    "pages/PlayerPage",
+    "pages/SettingsPage",
+    "pages/LivePlayPage",
+    "pages/HistoryPage",
+    "pages/FavoritePage",
+    "pages/PanConfigPage",
+    "pages/PanLoginPage"
+  ]
+}

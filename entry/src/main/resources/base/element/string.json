@@ -1,0 +1,10 @@
+{
+  "string": [
+    { "name": "module_desc", "value": "微影视" },
+    { "name": "EntryAbility_desc", "value": "微影视视频播放器" },
+    { "name": "EntryAbility_label", "value": "微影视" },
+    { "name": "reason_internet", "value": "用于获取视频源数据和在线播放" },
+    { "name": "reason_network", "value": "用于检测网络连接状态" },
+    { "name": "reason_audio", "value": "用于调节播放音量" },
+    { "name": "reason_background", "value": "用于投屏播放时保持后台运行" }]
+}

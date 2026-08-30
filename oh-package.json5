@@ -1,0 +1,12 @@
+{
+  "modelVersion": "6.1.1",
+  "name": "weiyingshi",
+  "version": "1.0.4",
+  "description": "影视仓 for HarmonyOS NEXT",
+  "main": "",
+  "author": "Weiyingshi",
+  "license": "Apache-2.0",
+  "dependencies": {},
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}

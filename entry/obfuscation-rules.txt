@@ -1,0 +1,218 @@
+# ArkGuard 混淆规则 - 影视仓
+# 参考: https://gitee.com/openharmony/arkcompiler_ets_frontend/tree/master/arkguard
+
+# ==== 基础选项 ====
+-enable-toplevel-obfuscation
+-enable-property-obfuscation
+-enable-string-property-obfuscation
+-enable-filename-obfuscation
+-enable-export-obfuscation
+-compact
+-remove-log
+
+# ==== 保留 .d.ts 中声明的所有名字 ====
+-keep-dts
+
+# ==== 保留 ArkTS 装饰器 / 组件生命周期 顶层符号 ====
+-keep-global-name
+    Component
+    Entry
+    State
+    Prop
+    Link
+    Provide
+    Consume
+    ObjectLink
+    Observed
+    Watch
+    Builder
+    BuilderParam
+    Styles
+    Extend
+    CustomDialog
+    LocalStorageProp
+    LocalStorageLink
+    StorageProp
+    StorageLink
+    Concurrent
+    Sendable
+    Reusable
+    Require
+    Track
+    aboutToAppear
+    aboutToDisappear
+    onPageShow
+    onPageHide
+    onBackPress
+    build
+    pageTransition
+
+# ==== 保留所有 JSON/网络协议字段（TVBox / cat 源 / 网盘 API / m3u / xml） ====
+# 属性名混淆和字符串字面量属性名混淆都要保留这些名字
+-keep-property-name
+    # TVBox 站点/解析/直播配置
+    sites
+    parses
+    lives
+    spider
+    wallpaper
+    warningText
+    doh
+    rules
+    ads
+    flags
+    jar
+    ext
+    api
+    key
+    name
+    type
+    searchable
+    quickSearch
+    filterable
+    changeable
+    playerType
+    ua
+    click
+    format
+    epg
+    logo
+    urls
+    channels
+    channel
+    group
+    categories
+    host
+    hosts
+    homepage
+    style
+    jarCache
+    configJson
+    configUrl
+    jx
+    liveUrl
+    replace
+    proxy
+    catchup
+    sort
+    filters
+    filter
+    class
+    # 内容响应
+    list
+    page
+    pagecount
+    limit
+    total
+    # 视频记录字段（vod_*）
+    vod_id
+    vod_name
+    vod_pic
+    vod_year
+    vod_area
+    vod_lang
+    vod_tag
+    vod_actor
+    vod_director
+    vod_content
+    vod_remarks
+    vod_play_from
+    vod_play_url
+    # 分类字段（type_*）
+    type_id
+    type_name
+    type_pid
+    type_flag
+    # 播放/解析
+    parse
+    playUrl
+    url
+    header
+    headers
+    method
+    body
+    followRedirect
+    followRedirects
+    referer
+    Referer
+    User-Agent
+    Content-Type
+    Cookie
+    cookie
+    usingProtocol
+    timeout
+    origin
+    postType
+    # 网盘（阿里/夸克/百度/UC 等）
+    ali
+    access_token
+    accessToken
+    accessExpireAt
+    refresh_token
+    expires_in
+    share_token
+    stoken
+    token
+    fid
+    dir
+    dlink
+    download_url
+    file_url
+    file_info
+    p
+    # 通用错误/结果包装
+    ok
+    code
+    errno
+    error
+    msg
+    message
+    data
+    result
+    state
+    # 弹幕/字幕/番剧
+    danmaku
+    bangumi
+    animeId
+    episodeId
+    episodeNumber
+    episodeTitle
+    episodes
+    number
+    start
+    end
+    text
+    title
+    extra
+    source
+    comments
+    epg_data
+    # M3U 直播
+    tvg-id
+    tvg-name
+    tvg-chno
+    # 本地状态
+    searchHistory
+    updatedAt
+
+# ==== 保留 SendableClass / NAPI Any 桥接可能反射的字段 ====
+-keep-property-name
+    fetch
+    request
+    response
+    status
+    statusCode
+
+# ==== 保留可能通过反射调用的模块 API ====
+-keep-global-name
+    init
+    home
+    homeVod
+    category
+    detail
+    search
+    play
+    live
+    isVideoFormat
+    manualVideoCheck
+    action

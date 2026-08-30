@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- 启动图标：整体缩至画布中央 ~40%，四周透明，让启动画面显示大小接近桌面图标 -->
+  <rect x="304" y="304" width="416" height="416" rx="90" ry="90" fill="#2F6FEB"/>
+  <rect x="366" y="366" width="292" height="292" rx="80" ry="80" fill="#FFFFFF" opacity="0.14"/>
+  <path d="
+      M 456 434
+      Q 446 428 446 440
+      L 446 588
+      Q 446 600 456 594
+      L 594 519
+      Q 604 512 594 505
+      Z"
+    fill="#FFFFFF"/>
+</svg>

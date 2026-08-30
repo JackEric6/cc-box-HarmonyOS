@@ -1,0 +1,4 @@
+# 忽略所有实际密钥/证书文件，只保留 README
+*
+!README.md
+!.gitignore
