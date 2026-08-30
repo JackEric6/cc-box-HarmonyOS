@@ -39,13 +39,74 @@ entry/src/main/ets/
 hvigorw --no-daemon assembleHap
 ```
 
-## 签名与本地构建
+## 从源码构建（贡献者指南）
 
-仓库中的 `build-profile.json5` 已移除个人证书路径和签名密码。clone 后请按下面的步骤在 DevEco Studio 中重新配置：
+### 1. 克隆代码
 
-1. 打开 `File → Project Structure → Signing Configs`，勾选 `Automatically generate signature`，或手动选择你自己的 `.p12` / `.cer` / `.p7b`。
-2. 如果使用 Release 证书，把生成的 `storePassword` / `keyPassword` 回填到 `build-profile.json5`，并确保这些值只保留在本地，不提交到仓库。
-3. 私钥、证书和 Profile 文件统一放到 `signature/`，该目录已配置忽略实际密钥文件，只保留说明文档。
+```powershell
+git clone https://github.com/yuppiesnotzhuhao/TvBoxHarmony.git
+cd TvBoxHarmony
+```
+
+### 2. 环境要求
+
+- DevEco Studio 5.0 及以上
+- HarmonyOS SDK 6.1.1(24)，compatibleSdkVersion 6.1.0(23)
+- 项目使用 ArkTS / Stage 模型，Node 由 DevEco Studio 自带
+
+### 3. 同步依赖
+
+用 DevEco Studio 打开工程根目录 `TVBoxHarmony`，等待 `oh_modules` 依赖自动同步完成。如果同步失败，可在终端执行：
+
+```powershell
+ohpm install
+```
+
+### 4. 配置签名
+
+仓库中的 `build-profile.json5` 已移除个人证书和路径，直接构建会报签名相关错误。请先配置本地签名：
+
+**方式一：自动签名（最快，适合测试）**
+
+1. `File → Project Structure → Signing Configs`
+2. 勾选 `Automatically generate signature`
+3. 登录华为账号并同意，DevEco Studio 会自动生成调试证书
+
+**方式二：手动签名（适合正式发布）**
+
+1. 准备自己的 `.p12` / `.cer` / `.p7b` 文件
+2. 在签名配置中选择对应的文件并填写别名和密码
+3. 把生成的 `storePassword` / `keyPassword` 回填到 `build-profile.json5`
+
+> 注意：签名密码、私钥、证书、Profile 文件**不要提交到 Git**。`signature/` 目录已配置忽略实际密钥文件。
+
+### 5. 构建 Hap
+
+**DevEco Studio 构建（推荐）**
+
+`Build → Build Hap(s)/APP(s) → Build Hap(s)`
+
+构建产物路径：
+
+```
+entry/build/default/outputs/default/entry-default-signed.hap
+```
+
+**命令行构建**
+
+```powershell
+.\hvigorw --no-daemon assembleHap
+```
+
+如果报 `spawn java ENOENT`，说明系统缺少 Java 环境，改用 DevEco Studio 构建即可。
+
+### 6. 安装到设备
+
+```powershell
+hdc install entry-default-signed.hap
+```
+
+或直接在 DevEco Studio 点击运行按钮。
 
 ## 订阅地址
 
