@@ -1,6 +1,8 @@
-# 影视仓 (Yingshicang)
+# 微影视 (TvBoxHarmony)
 
 面向 HarmonyOS NEXT 的原生视频聚合播放应用，使用 ArkTS / ArkUI 编写，支持手机、平板与 2in1 设备。
+
+> 应用安装后桌面显示名称为「微影视」，仓库项目名为 `TvBoxHarmony`，二者指的是同一个项目。
 
 ## 功能概览
 
