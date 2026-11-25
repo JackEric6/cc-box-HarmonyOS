@@ -35,12 +35,7 @@
         "compatibleSdkVersion": "6.1.0(23)",
         "targetSdkVersion": "6.1.1(24)",
         "compileSdkVersion": "6.1.1(24)",
-        "runtimeOS": "HarmonyOS",
-        "buildOption": {
-          "packOptions": {
-            "buildAppSkipSignHap": true
-          }
-        }
+        "runtimeOS": "HarmonyOS"
       }
     ],
     "buildModeSet": [
