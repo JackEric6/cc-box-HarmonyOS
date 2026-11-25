@@ -17,7 +17,7 @@ function randomText(length: number): string {
   const bytes = random.generateRandomSync(length * 2).data;
   const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
-  for (let i = 0; i < length; i++) result += alphabet[bytes[i] % alphabet.length];
+  for (let i = 0; i < length; i++) result += alphabet.charAt(bytes[i] % alphabet.length);
   return result;
 }
 
@@ -51,7 +51,7 @@ async function aesCrypt(value: string, key: string, iv: string, encrypt: boolean
   return encrypt ? bytesToHex(result.data).toUpperCase() : buffer.from(result.data).toString('utf-8');
 }
 
-export async function createGuaziForm(params: Record<string, Object>, token: string, time: number):
+export async function createGuaziForm(params: Object, token: string, time: number):
 Promise<Map<string, string>> {
   const key = randomText(16);
   const iv = randomText(16);

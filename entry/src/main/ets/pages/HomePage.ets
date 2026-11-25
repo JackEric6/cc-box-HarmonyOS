@@ -24,6 +24,7 @@ import { getBottomSafeAreaVp, getTopSafeAreaVp, getTopSafeAreaSync, getLeftSafeA
 import { DS, Motion } from '../utils/DesignSystem';
 import { Palette } from '../utils/ThemeManager';
 import { display } from '@kit.ArkUI';
+import { buffer } from '@kit.ArkTS';
 const WEEK_DAYS: string[] = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
 interface RowData {
@@ -279,7 +280,7 @@ struct HomePage {
       try {
         const context = getContext() as common.UIAbilityContext;
         const rawConfig = await context.resourceManager.getRawFileContent('cc_box_sources.json');
-        const configText = new TextDecoder('utf-8').decode(rawConfig);
+        const configText = buffer.from(rawConfig).toString('utf-8');
         restored = await config.loadConfig(configText);
       } catch (e) {
         hilog.error(0x0001, 'YSC', 'bundled config load failed: %{public}s', formatError(e));

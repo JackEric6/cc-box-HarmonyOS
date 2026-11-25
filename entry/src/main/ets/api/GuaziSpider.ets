@@ -34,6 +34,43 @@ interface EpisodePayload {
   type: string;
 }
 
+interface GuaziVod {
+  vod_id: string;
+  vod_name: string;
+  vod_pic: string;
+  vod_year: string;
+  vod_area: string;
+  vod_actor: string;
+  vod_director: string;
+  type_name: string;
+  vod_score: string;
+  vod_remarks: string;
+  vod_content: string;
+  vod_play_from: string;
+  vod_play_url: string;
+}
+
+interface GuaziClassItem {
+  type_id: string;
+  type_name: string;
+}
+
+interface GuaziPageResult {
+  code: number;
+  page: number;
+  pagecount: number;
+  limit: number;
+  total: number;
+  list: GuaziVod[];
+}
+
+function makeClassItem(section: HomeSection): GuaziClassItem {
+  return {
+    type_id: 'guazi-playlist:' + section.pid + ':' + section.showId,
+    type_name: section.title
+  };
+}
+
 function stringValue(object: Record<string, Object>, keys: string[]): string {
   for (const key of keys) {
     const value = object[key];
@@ -57,13 +94,13 @@ function firstArray(object: Record<string, Object>, keys: string[]): Object[] {
   return [];
 }
 
-function mapVod(source: Record<string, Object>): Record<string, Object> {
+function mapVod(source: Record<string, Object>): GuaziVod {
   const content = stringValue(source, [
     'vod_use_content', 'd_content', 'd_blurb', 'd_desc', 'd_description', 'd_intro', 'd_synopsis',
     'd_summary', 'vod_content', 'vod_blurb', 'vod_desc', 'vod_description', 'vod_intro', 'vod_summary',
     'synopsis', 'summary', 'intro', 'introduction', 'description', 'desc', 'content'
   ]).replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]+>/g, '').trim();
-  return {
+  const vod: GuaziVod = {
     vod_id: stringValue(source, ['vod_id', 'd_id', 'id', 'show_id', 'vodId']),
     vod_name: stringValue(source, ['vod_name', 'd_name', 'c_name', 'name', 'title', 'vod_title']),
     vod_pic: stringValue(source, ['vod_pic', 'd_pic', 'c_pic', 'pic']),
@@ -78,14 +115,29 @@ function mapVod(source: Record<string, Object>): Record<string, Object> {
     vod_play_from: '',
     vod_play_url: ''
   };
+  return vod;
 }
 
-function mergeVod(first: Record<string, Object>, second: Record<string, Object>): Record<string, Object> {
-  const merged: Record<string, Object> = Object.assign({}, first);
-  for (const key of Object.keys(second)) {
-    const value = second[key];
-    if (value !== undefined && value !== null && String(value).trim().length > 0) merged[key] = value;
-  }
+function mergeVod(first: GuaziVod, second: GuaziVod): GuaziVod {
+  const merged: GuaziVod = {
+    vod_id: first.vod_id, vod_name: first.vod_name, vod_pic: first.vod_pic, vod_year: first.vod_year,
+    vod_area: first.vod_area, vod_actor: first.vod_actor, vod_director: first.vod_director,
+    type_name: first.type_name, vod_score: first.vod_score, vod_remarks: first.vod_remarks,
+    vod_content: first.vod_content, vod_play_from: first.vod_play_from, vod_play_url: first.vod_play_url
+  };
+  if (second.vod_id) merged.vod_id = second.vod_id;
+  if (second.vod_name) merged.vod_name = second.vod_name;
+  if (second.vod_pic) merged.vod_pic = second.vod_pic;
+  if (second.vod_year) merged.vod_year = second.vod_year;
+  if (second.vod_area) merged.vod_area = second.vod_area;
+  if (second.vod_actor) merged.vod_actor = second.vod_actor;
+  if (second.vod_director) merged.vod_director = second.vod_director;
+  if (second.type_name) merged.type_name = second.type_name;
+  if (second.vod_score) merged.vod_score = second.vod_score;
+  if (second.vod_remarks) merged.vod_remarks = second.vod_remarks;
+  if (second.vod_content) merged.vod_content = second.vod_content;
+  if (second.vod_play_from) merged.vod_play_from = second.vod_play_from;
+  if (second.vod_play_url) merged.vod_play_url = second.vod_play_url;
   return merged;
 }
 
@@ -107,7 +159,8 @@ function episodePayload(vodId: string, cloudId: string, episode: Record<string, 
         }
       }
     } else if (typeof rawParam === 'object' && !Array.isArray(rawParam)) {
-      Object.assign(param, rawParam as Record<string, Object>);
+      const rawFields = rawParam as Record<string, Object>;
+      for (const key of Object.keys(rawFields)) param[key] = rawFields[key];
     }
     const domainType = stringValue(param, ['domain_type']);
     const selectedResolution = stringValue(param, ['resolution']) || resolution;
@@ -149,7 +202,7 @@ function playableUrl(value: Object): string {
 }
 
 export class GuaziSpider extends Spider {
-  private catalog: Map<string, Record<string, Object>> = new Map();
+  private catalog: Map<string, GuaziVod> = new Map();
 
   override init(bean: SourceConfig): void {
     this.siteKey = bean.key;
@@ -159,11 +212,9 @@ export class GuaziSpider extends Spider {
 
   override async homeContent(_filter: boolean): Promise<string> {
     const list = await GuaziSpider.loadPlaylist(HOME_SECTIONS[0]);
+    const classes: GuaziClassItem[] = HOME_SECTIONS.map((section: HomeSection): GuaziClassItem => makeClassItem(section));
     return JSON.stringify({
-      class: HOME_SECTIONS.map((section: HomeSection) => ({
-        type_id: 'guazi-playlist:' + section.pid + ':' + section.showId,
-        type_name: section.title
-      })),
+      class: classes,
       code: 1, page: 1, pagecount: 1, limit: 30, total: list.length, list: list
     });
   }
@@ -191,8 +242,8 @@ export class GuaziSpider extends Spider {
     for (const raw of list) {
       if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
       const vod = mapVod(raw as Record<string, Object>);
-      if (!vod['vod_id']) continue;
-      this.catalog.set(String(vod['vod_id']), vod);
+      if (!vod.vod_id) continue;
+      this.catalog.set(vod.vod_id, vod);
       mapped.push(vod);
     }
     return JSON.stringify({ code: mapped.length ? 1 : 0, page: 1, pagecount: 1, total: mapped.length, list: mapped });
@@ -214,7 +265,8 @@ export class GuaziSpider extends Spider {
         }
       }
     }
-    let vod = mergeVod(this.catalog.get(id) ?? {}, mapVod(source));
+    const cached = this.catalog.get(id);
+    let vod = cached ? mergeVod(cached, mapVod(source)) : mapVod(source);
     if (!vod['vod_content']) {
       try {
         vod = mergeVod(vod, mapVod(await GuaziApi.playInfo(id)));
@@ -254,7 +306,7 @@ export class GuaziSpider extends Spider {
   override async playerContent(_flag: string, id: string): Promise<PlayInfo | null> {
     const prefix = 'ccbox-guazi://play/';
     if (!id.startsWith(prefix)) return await super.playerContent(_flag, id);
-    const payload = JSON.parse(decodeURIComponent(id.substring(prefix.length))) as Record<string, Object>;
+    const payload = JSON.parse(decodeURIComponent(id.substring(prefix.length))) as EpisodePayload;
     const result = await GuaziApi.play(payload);
     const url = playableUrl(result);
     if (!url) throw new Error('瓜子播放接口没有返回媒体地址');
@@ -266,21 +318,21 @@ export class GuaziSpider extends Spider {
     return GuaziSpider.mapPage(response, new Map<string, Record<string, Object>>()).list as Object[];
   }
 
-  private static mapPage(response: Record<string, Object>, cache: Map<string, Record<string, Object>>):
-  { code: number; page: number; pagecount: number; limit: number; total: number; list: Object[] } {
+  private static mapPage(response: Record<string, Object>, cache: Map<string, GuaziVod>): GuaziPageResult {
     const sourceList = firstArray(response, ['list', 'data', 'result', 'payload']);
-    const list: Object[] = [];
+    const list: GuaziVod[] = [];
     for (const raw of sourceList) {
       if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue;
       const vod = mapVod(raw as Record<string, Object>);
-      const id = String(vod['vod_id'] ?? '');
+      const id = vod.vod_id;
       if (!id) continue;
       cache.set(id, vod);
       list.push(vod);
     }
     const total = Number(response['total'] ?? list.length);
-    return { code: list.length ? 1 : 0, page: Number(response['page'] ?? 1),
+    const result: GuaziPageResult = { code: list.length ? 1 : 0, page: Number(response['page'] ?? 1),
       pagecount: Number(response['pagecount'] ?? Math.max(1, Math.ceil(total / 30))),
       limit: 30, total: Math.max(total, list.length), list: list };
+    return result;
   }
 }
