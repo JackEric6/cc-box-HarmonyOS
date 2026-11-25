@@ -5,7 +5,7 @@
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 
-const PREF_NAME = 'weiyingshi_prefs';
+const PREF_NAME = 'cc_box_harmonyos_prefs';
 let prefStore: preferences.Preferences | null = null;
 let injectedContext: common.UIAbilityContext | null = null;
 

@@ -1,0 +1,48 @@
+name: HarmonyOS Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev
+
+      - name: Setup HarmonyOS CLI
+        uses: ErBWs/setup-ohos@4dbb63025116eb6165ceac58a4bf47cbdc5ac721
+        with:
+          version: 6.1.1.280
+          cache: true
+
+      - name: Install project dependencies
+        run: ohpm install
+
+      - name: Build HAP
+        run: hvigorw --mode module -p module=entry@default assembleHap
+
+      - name: Upload HAP artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cc-box-harmonyos-hap
+          path: |
+            entry/build/default/outputs/default/entry-default-unsigned.hap
+            entry/build/default/outputs/default/entry-default-signed.hap
+            entry/build/default/outputs/default/*.hap
+          if-no-files-found: error
+          retention-days: 14

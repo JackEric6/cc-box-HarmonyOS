@@ -15,6 +15,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Spider } from './Spider';
 import { JsSpider } from './JsSpider';
 import { T4Spider } from './T4Spider';
+import { GuaziSpider } from './GuaziSpider';
 
 const PREF_KEY_CONFIG_URL = 'config_url';
 const PREF_KEY_CURRENT_SOURCE = 'current_source_key';
@@ -483,6 +484,9 @@ export class ApiConfig {
     if (this.sourceKeyList.length > 0) {
       const savedKey = PreferencesUtil.getSync(PREF_KEY_HOME_API, '');
       const savedBean = savedKey.length > 0 ? this.sourceBeanList.get(savedKey) : null;
+      const configuredDefaultKey = safeJsonString(obj, 'defaultHomeSourceKey', '');
+      const configuredDefaultBean = configuredDefaultKey.length > 0
+        ? this.sourceBeanList.get(configuredDefaultKey) : null;
       let usableCount = 0;
       for (const sk of this.sourceKeyList) {
         const sb = this.sourceBeanList.get(sk);
@@ -501,6 +505,8 @@ export class ApiConfig {
       }
       if (savedBean && this.isUsableSource(savedBean)) {
         this.homeSourceKey = savedKey;
+      } else if (configuredDefaultBean && this.isUsableSource(configuredDefaultBean)) {
+        this.homeSourceKey = configuredDefaultKey;
       } else if (firstUsableSite) {
         this.homeSourceKey = firstUsableSite.key;
       } else {
@@ -818,6 +824,12 @@ export class ApiConfig {
     if (!sp) {
       const bean = this.getSource(key);
       if (!bean) throw new Error('source not found: ' + key);
+      if (bean.key === 'guazi' || bean.type === 5) {
+        const guazi = new GuaziSpider();
+        guazi.init(bean);
+        this.spiders.set(key, guazi);
+        return guazi;
+      }
       // type=4 (T4 后端: ??T4Spider
       const isT4Source: boolean = bean.type === 4
         && (bean.api.startsWith('http://') || bean.api.startsWith('https://'));

@@ -1,9 +1,9 @@
 {
   "app": {
-    "bundleName": "com.weiyingshi.player",
-    "vendor": "Weiyingshi",
-    "versionCode": 1000004,
-    "versionName": "1.0.4",
+    "bundleName": "com.jackeric.ccbox.harmonyos",
+    "vendor": "JackEric6",
+    "versionCode": 1000000,
+    "versionName": "0.1.0",
     "icon": "$media:layered_image",
     "label": "$string:app_name",
     "minAPIVersion": 23,

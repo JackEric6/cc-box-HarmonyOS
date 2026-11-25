@@ -1,0 +1,18 @@
+This project is derived from TvBoxHarmony:
+https://github.com/yuppiesnotzhuhao/TvBoxHarmony
+
+The upstream HarmonyOS ArkTS implementation is distributed under the
+Apache License 2.0. The upstream LICENSE file is retained in this repository.
+
+Changes in this repository include:
+- Application identity and display name changed to cc-box-HarmonyOS / 丛丛影视.
+- Added a bundled source configuration derived from the cc-tv-box Android
+  project's app/src/main/assets/congcong_sources.json.
+- Replaced Android loopback proxy URLs with direct CMS API URLs where the
+  Android configuration contained an explicit source URL.
+- Added an ArkTS Guazi source adapter based on the protocol implementation in
+  the cc-tv-box Android project's GuaziApi, GuaziCrypto and GuaziAdapter.
+- Jianpian is intentionally excluded at the user's direction.
+
+HarmonyOS runtime behavior and HAP build/signing must be verified by the
+repository's GitHub Actions workflow and on a HarmonyOS device.

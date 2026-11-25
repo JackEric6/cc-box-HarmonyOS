@@ -274,7 +274,17 @@ struct HomePage {
   async initApp() {
     hilog.info(0x0001, 'YSC', 'initApp started');
     const config = getApiConfig();
-    const restored = await config.restoreConfig();
+    let restored = await config.restoreConfig();
+    if (!restored) {
+      try {
+        const context = getContext() as common.UIAbilityContext;
+        const rawConfig = await context.resourceManager.getRawFileContent('cc_box_sources.json');
+        const configText = new TextDecoder('utf-8').decode(rawConfig);
+        restored = await config.loadConfig(configText);
+      } catch (e) {
+        hilog.error(0x0001, 'YSC', 'bundled config load failed: %{public}s', formatError(e));
+      }
+    }
     hilog.info(0x0001, 'YSC', 'restoreConfig result: %{public}s', String(restored));
     this.configLoaded = true;
     if (restored) {
