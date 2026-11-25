@@ -42,7 +42,7 @@ interface PlayInfoParams {
   token: string;
 }
 
-interface PlayParams {
+export interface PlayParams {
   vod_id: string;
   domain_type: string;
   vurl_id: string;

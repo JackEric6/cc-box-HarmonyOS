@@ -1,6 +1,6 @@
 import { PlayInfo } from '../model/Movie';
 import { SourceBean as SourceConfig } from '../model/SourceBean';
-import { GuaziApi } from './GuaziApi';
+import { GuaziApi, PlayParams } from './GuaziApi';
 import { Spider } from './Spider';
 
 interface HomeSection {
@@ -25,14 +25,6 @@ const HOME_SECTIONS: HomeSection[] = [
   { showId: '8', title: '冷门悬疑佳片Top20', pid: '3' },
   { showId: '6663', title: '近期热门综艺', pid: '6' }
 ];
-
-interface EpisodePayload {
-  vod_id: string;
-  domain_type: string;
-  vurl_id: string;
-  resolution: string;
-  type: string;
-}
 
 interface GuaziVod {
   vod_id: string;
@@ -141,7 +133,7 @@ function mergeVod(first: GuaziVod, second: GuaziVod): GuaziVod {
   return merged;
 }
 
-function episodePayload(vodId: string, cloudId: string, episode: Record<string, Object>): EpisodePayload | null {
+function episodePayload(vodId: string, cloudId: string, episode: Record<string, Object>): PlayParams | null {
   const vurlId = stringValue(episode, ['id', 'vurl_id']);
   const play = episode['play'] as Record<string, Object> | undefined;
   if (!vurlId || !play) return null;
@@ -267,13 +259,13 @@ export class GuaziSpider extends Spider {
     }
     const cached = this.catalog.get(id);
     let vod = cached ? mergeVod(cached, mapVod(source)) : mapVod(source);
-    if (!vod['vod_content']) {
+    if (!vod.vod_content) {
       try {
         vod = mergeVod(vod, mapVod(await GuaziApi.playInfo(id)));
       } catch (_e) {}
     }
-    vod['vod_id'] = id;
-    if (!vod['vod_name']) vod['vod_name'] = id;
+    vod.vod_id = id;
+    if (!vod.vod_name) vod.vod_name = id;
     const clouds = (source['vurl_clouds'] as Object[] | undefined) ?? [];
     const flags: string[] = [];
     const groups: string[] = [];
@@ -298,15 +290,15 @@ export class GuaziSpider extends Spider {
         groups.push(urls.join('#'));
       }
     }
-    vod['vod_play_from'] = flags.join('$$$');
-    vod['vod_play_url'] = groups.join('$$$');
+    vod.vod_play_from = flags.join('$$$');
+    vod.vod_play_url = groups.join('$$$');
     return JSON.stringify({ code: 1, page: 1, pagecount: 1, total: 1, list: [vod] });
   }
 
   override async playerContent(_flag: string, id: string): Promise<PlayInfo | null> {
     const prefix = 'ccbox-guazi://play/';
     if (!id.startsWith(prefix)) return await super.playerContent(_flag, id);
-    const payload = JSON.parse(decodeURIComponent(id.substring(prefix.length))) as EpisodePayload;
+    const payload = JSON.parse(decodeURIComponent(id.substring(prefix.length))) as PlayParams;
     const result = await GuaziApi.play(payload);
     const url = playableUrl(result);
     if (!url) throw new Error('瓜子播放接口没有返回媒体地址');
@@ -315,7 +307,7 @@ export class GuaziSpider extends Spider {
 
   private static async loadPlaylist(section: HomeSection): Promise<Object[]> {
     const response = await GuaziApi.homePlaylist(section.showId, section.pid);
-    return GuaziSpider.mapPage(response, new Map<string, Record<string, Object>>()).list as Object[];
+    return GuaziSpider.mapPage(response, new Map<string, GuaziVod>()).list as Object[];
   }
 
   private static mapPage(response: Record<string, Object>, cache: Map<string, GuaziVod>): GuaziPageResult {
